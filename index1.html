@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes App</title>
+  <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+  <h1>My Notes</h1>
+
+  <div class="note-container">
+    </div>
+
+  <div class="add-note">
+    <h2>Add a Note</h2>
+    <textarea id="new-note" placeholder="Write your note here..."></textarea>
+    <button id="add-btn">Add Note</button>
+  </div>
+
+  <script>
+    const addBtn = document.getElementById('add-btn');
+  const newNote = document.getElementById('new-note');
+  const noteContainer = document.querySelector('.note-container');
+
+  // Get notes from local storage (if available)
+  let notes = JSON.parse(localStorage.getItem('notes')) || [];
+
+  // Function to display notes
+  function displayNotes() {
+    noteContainer.innerHTML = ''; // Clear previous notes
+    notes.forEach((note, index) => {
+      const noteElement = document.createElement('div');
+      noteElement.classList.add('note');
+      noteElement.innerHTML = `
+        <h3>${note.title}</h3>
+        <p>${note.description}</p>
+        <button data-index=${index} class="delete-btn">Delete</button>
+      `;
+      noteContainer.appendChild(noteElement);
+    });
+  }
+
+  // Function to add a new note
+  function addNote() {
+    const title = newNote.value.split('\n')[0].trim(); // Get first line as title
+    const description = newNote.value.trim();
+
+    if (title && description) {
+      notes.push({ title, description });
+      localStorage.setItem('notes', JSON.stringify(notes));
+      newNote.value = ''; // Clear text area after adding
+      displayNotes();
+    }
+  }
+
+  // Add event listener to "Add Note" button
+  addBtn.addEventListener('click', addNote);
+
+  // Function to delete a note
+  function deleteNote(index) {
+    notes.splice(index, 1);
+    localStorage.setItem('notes', JSON.stringify(notes));
+    displayNotes();
+  }
+
+  // Event listener for delete buttons (dynamically added)
+  noteContainer.addEventListener('click', (event) => {
+    if (event.target.classList.contains('delete-btn')) {
+      const index = event.target.dataset.index;
+      deleteNote(index);
+    }
+  });
+
+  // Display existing notes on page load
+  displayNotes();
+
+  </script>
+</body>
+</html>
